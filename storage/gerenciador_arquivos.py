@@ -3,7 +3,7 @@ from estruturas.arvore_binaria import ArvoreBinaria
 from modelos.entidades import Aluno, Professor, Modalidade, Matricula
 
 class GerenciadorAlunos:
-    def __init__(self, caminho_arquivo="alunos.txt"):
+    def __init__(self, caminho_arquivo="data/alunos.txt"):
         self.arquivo = caminho_arquivo
         self.arvore = ArvoreBinaria()
         self._carregar_indices() #ele reconstroi a arvore
@@ -79,7 +79,7 @@ class GerenciadorAlunos:
             return True
 
 class GerenciadorProfessor:
-    def __init__(self, caminho_arquivo="professor.txt"):
+    def __init__(self, caminho_arquivo="data/professor.txt"):
         self.arquivo = caminho_arquivo
         self.arvore = ArvoreBinaria()
         self._carregar_indices() 
@@ -155,7 +155,7 @@ class GerenciadorProfessor:
             return True
 
 class GerenciadorModalidade:
-    def __init__(self, caminho_arquivo="modalidade.txt"):
+    def __init__(self, caminho_arquivo="data/modalidade.txt"):
         self.arquivo = caminho_arquivo
         self.arvore = ArvoreBinaria()
         self._carregar_indices() 
@@ -232,7 +232,7 @@ class GerenciadorModalidade:
 
 #
 class GerenciadorMatricula:
-    def __init__(self, caminho_arquivo="matricula.txt"):
+    def __init__(self, caminho_arquivo="data/matricula.txt"):
         self.arquivo = caminho_arquivo
         self.arvore = ArvoreBinaria()
         self._carregar_indices() 
