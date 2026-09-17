@@ -200,4 +200,4 @@ class Matricula:
         if qtd_convertida <= 0:
             raise ValueError("Erro: A quantidade de aulas deve ser maior que 0!")
             
-        self._qtd_aulas = qtd_convertida
+        self._qtd_aulas = qtd_convertida        
