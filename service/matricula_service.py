@@ -1,6 +1,6 @@
 from model.entidades import Matricula, Aluno, Modalidade
 
-class Matricula:
+class MatriculaService:
     def __init__(self, gerenciador_mat, gerenciador_aluno, gerenciador_mod):
         self.gerenciador_mat = gerenciador_mat
         self.gerenciador_aluno = gerenciador_aluno
@@ -8,8 +8,8 @@ class Matricula:
 
     def realizar_matricula(self, codigo_mat, codigo_aluno, codigo_mod, qtd_aulas):
         if self.gerenciador_mat.findById(codigo_mat) is not None:
-            raise ValueError("Erro: O código de matricula já existe!")    
-        if self.gerenciador_aluno.findById(codigo_aluno) is not None:
+            raise ValueError("Erro: O código de matricula já existe")    
+        if self.gerenciador_aluno.findById(codigo_aluno) is None:
             raise ValueError(f"Erro: Aluno com o {codigo_aluno} não existe")
         
         modalidade = self.gerenciador_mod.findById(codigo_mod)
@@ -24,7 +24,8 @@ class Matricula:
         self.gerenciador_mat.save(nova_matricula)
 
         modalidade.total_alunos += 1
-        self.gerenciador_mod.update(modalidade)
+        self.gerenciador_mod.update(modalidade)        
+        return True
 
     def listar_matriculas(self):
         matricula = self.gerenciador_mat.findAll()
@@ -33,7 +34,7 @@ class Matricula:
         return matricula
 
     def buscar_cod(self, codigo_mat):
-        matricula = self.gerenciador_prof.findById(codigo) 
+        matricula = self.gerenciador_mat.findById(codigo_mat) 
         if matricula is None:
             raise ValueError(f"Erro: Nenhuma matricula encontrado no sistema com o código: {codigo_mat}")
         return matricula
@@ -41,6 +42,10 @@ class Matricula:
     def excluir(self, codigo_mat):
         self.buscar_cod(codigo_mat)
         self.gerenciador_mat.delete(codigo_mat)
+        modalidade = self.gerenciador_mod.findById(matricula_excluida.codigo_modalidade)
+        if modalidade is not None:
+            modalidade.total_alunos -= 1
+            self.gerenciador_mod.update(modalidade)
 
     def atualizar(self, codigo_mat, codigo_aluno, codigo_mod, qtd_aulas):
         self.buscar_cod(codigo_mat)
