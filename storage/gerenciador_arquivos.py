@@ -20,14 +20,14 @@ class GerenciadorAlunos:
                 posicao_atual = f.tell() 
                 linha = f.readline()
     
-    def salvar(self, aluno: Aluno):                            
+    def save(self, aluno: Aluno):                            
         with open(self.arquivo, "a", encoding="utf-8") as f:
             posicao = f.tell()
             linha_texto = f"{aluno.codigo_aluno};{aluno.nome};{aluno.data_nascimento};{aluno.peso};{aluno.altura}\n"
             f.write(linha_texto)
             self.arvore.inserir_no(aluno.codigo_aluno, posicao)
 
-    def buscar_codigo(self, codigo_aluno):
+    def findById(self, codigo_aluno):
         posicao = self.arvore.buscar(codigo_aluno)
 
         if posicao is None:
@@ -40,7 +40,7 @@ class GerenciadorAlunos:
             return Aluno(dados[0],dados[1],dados[2],dados[3],dados[4])
 
 
-    def listar(self):
+    def findAll(self):
         posicoes = self.arvore.obter_posicoes_em_ordem()
         alunos_cadastrados = []
         with open(self.arquivo, "r", encoding="utf-8") as f:
@@ -52,12 +52,12 @@ class GerenciadorAlunos:
                 alunos_cadastrados.append(aluno)
             return alunos_cadastrados
 
-    def excluir(self, codigo_aluno):
+    def delete(self, codigo_aluno):
         posicao = self.arvore.buscar(codigo_aluno)
 
         if posicao is None:
             return False
-        todos_alunos = self.listar()
+        todos_alunos = self.findAll()
 
         with open(self.arquivo, "w", encoding="utf-8") as f:
             pass
@@ -65,16 +65,16 @@ class GerenciadorAlunos:
 
         for aluno in todos_alunos:
             if aluno.codigo_aluno != codigo_aluno:
-                self.salvar(aluno) 
+                self.save(aluno) 
                 
         return True
 
 
-    def atualizar(self, aluno_modificado: Aluno):
+    def update(self, aluno_modificado: Aluno):
             if self.arvore.buscar(aluno_modificado.codigo_aluno) is None:
                 return False 
-            self.excluir(aluno_modificado.codigo_aluno)
-            self.salvar(aluno_modificado)
+            self.delete(aluno_modificado.codigo_aluno)
+            self.save(aluno_modificado)
             
             return True
 
@@ -96,14 +96,14 @@ class GerenciadorProfessor:
                 posicao_atual = f.tell() 
                 linha = f.readline()
     
-    def salvar(self, prof: Professor):                            
+    def save(self, prof: Professor):                            
         with open(self.arquivo, "a", encoding="utf-8") as f:
             posicao = f.tell()
             linha_texto = f"{prof.codigo_prof};{prof.nome};{prof.endereco};{prof.telefone}\n"
             f.write(linha_texto)
             self.arvore.inserir_no(prof.codigo_prof, posicao)
 
-    def buscar_codigo(self, codigo_prof):
+    def findById(self, codigo_prof):
         posicao = self.arvore.buscar(codigo_prof)
 
         if posicao is None:
@@ -116,7 +116,7 @@ class GerenciadorProfessor:
             return Professor(dados[0],dados[1],dados[2],dados[3])
 
 
-    def listar(self):
+    def findAll(self):
         posicoes = self.arvore.obter_posicoes_em_ordem()
         professor_cadastrados = []
         with open(self.arquivo, "r", encoding="utf-8") as f:
@@ -128,12 +128,12 @@ class GerenciadorProfessor:
                 professor_cadastrados.append(prof)
             return professor_cadastrados
 
-    def excluir(self, codigo_prof):
+    def delete(self, codigo_prof):
         posicao = self.arvore.buscar(codigo_prof)
 
         if posicao is None:
             return False
-        todos_professores = self.listar()
+        todos_professores = self.findAll()
 
         with open(self.arquivo, "w", encoding="utf-8") as f:
             pass
@@ -141,16 +141,16 @@ class GerenciadorProfessor:
 
         for prof in todos_professores:
             if prof.codigo_prof != codigo_prof:
-                self.salvar(prof) 
+                self.save(prof) 
                 
         return True
 
 
-    def atualizar(self, prof_modificado: Professor):
+    def update(self, prof_modificado: Professor):
             if self.arvore.buscar(prof_modificado.codigo_prof) is None:
                 return False 
-            self.excluir(prof_modificado.codigo_prof)
-            self.salvar(prof_modificado)
+            self.delete(prof_modificado.codigo_prof)
+            self.save(prof_modificado)
             
             return True
 
@@ -172,14 +172,14 @@ class GerenciadorModalidade:
                 posicao_atual = f.tell() 
                 linha = f.readline()
     
-    def salvar(self, mod: Modalidade):                            
+    def save(self, mod: Modalidade):                            
         with open(self.arquivo, "a", encoding="utf-8") as f:
             posicao = f.tell()
             linha_texto = f"{mod.codigo_modalidade};{mod.descricao};{mod.codigo_prof};{mod.valor_aula};{mod.limite_alunos};{mod.total_alunos}\n"
             f.write(linha_texto)
             self.arvore.inserir_no(mod.codigo_modalidade, posicao)
 
-    def buscar_codigo(self, codigo_modalidade):
+    def findById(self, codigo_modalidade):
         posicao = self.arvore.buscar(codigo_modalidade)
 
         if posicao is None:
@@ -192,7 +192,7 @@ class GerenciadorModalidade:
             return Modalidade(dados[0],dados[1],dados[2],dados[3],dados[4],dados[5])
 
 
-    def listar(self):
+    def findAll(self):
         posicoes = self.arvore.obter_posicoes_em_ordem()
         modalidade_cadastradas = []
         with open(self.arquivo, "r", encoding="utf-8") as f:
@@ -204,12 +204,12 @@ class GerenciadorModalidade:
                 modalidade_cadastradas.append(mod)
             return modalidade_cadastradas
 
-    def excluir(self, codigo_modalidade):
+    def delete(self, codigo_modalidade):
         posicao = self.arvore.buscar(codigo_modalidade)
 
         if posicao is None:
             return False
-        todas_modalidades = self.listar()
+        todas_modalidades = self.findAll()
 
         with open(self.arquivo, "w", encoding="utf-8") as f:
             pass
@@ -217,16 +217,16 @@ class GerenciadorModalidade:
 
         for mod in todas_modalidades:
             if mod.codigo_modalidade != codigo_modalidade:
-                self.salvar(mod) 
+                self.save(mod) 
                 
         return True
 
 
-    def atualizar(self, mod_modificado: Modalidade):
+    def update(self, mod_modificado: Modalidade):
             if self.arvore.buscar(mod_modificado.codigo_modalidade) is None:
                 return False 
-            self.excluir(mod_modificado.codigo_modalidade)
-            self.salvar(mod_modificado)
+            self.delete(mod_modificado.codigo_modalidade)
+            self.save(mod_modificado)
             
             return True
 
@@ -249,14 +249,14 @@ class GerenciadorMatricula:
                 posicao_atual = f.tell() 
                 linha = f.readline()
     
-    def salvar(self, mat: Matricula):                            
+    def save(self, mat: Matricula):                            
         with open(self.arquivo, "a", encoding="utf-8") as f:
             posicao = f.tell()
             linha_texto = f"{mat.codigo_matricula};{mat.codigo_aluno};{mat.codigo_modalidade};{mat.qtd_aulas}\n"
             f.write(linha_texto)
             self.arvore.inserir_no(mat.codigo_matricula, posicao)
 
-    def buscar_codigo(self, codigo_matricula):
+    def findById(self, codigo_matricula):
         posicao = self.arvore.buscar(codigo_matricula)
 
         if posicao is None:
@@ -269,7 +269,7 @@ class GerenciadorMatricula:
             return Matricula(dados[0],dados[1],dados[2],dados[3])
 
 
-    def listar(self):
+    def findAll(self):
         posicoes = self.arvore.obter_posicoes_em_ordem()
         matricula_cadastradas = []
         with open(self.arquivo, "r", encoding="utf-8") as f:
@@ -281,12 +281,12 @@ class GerenciadorMatricula:
                 matricula_cadastradas.append(mat)
             return matricula_cadastradas
 
-    def excluir(self, codigo_matricula):
+    def delete(self, codigo_matricula):
         posicao = self.arvore.buscar(codigo_matricula)
 
         if posicao is None:
             return False
-        todas_matriculas = self.listar()
+        todas_matriculas = self.findAll()
 
         with open(self.arquivo, "w", encoding="utf-8") as f:
             pass
@@ -294,15 +294,15 @@ class GerenciadorMatricula:
 
         for mat in todas_matriculas:
             if mat.codigo_matricula != codigo_matricula:
-                self.salvar(mat) 
+                self.save(mat) 
                 
         return True
 
 
-    def atualizar(self, mat_modificado: Matricula):
+    def update(self, mat_modificado: Matricula):
             if self.arvore.buscar(mat_modificado.codigo_matricula) is None:
                 return False 
-            self.excluir(mat_modificado.codigo_matricula)
-            self.salvar(mat_modificado)
+            self.delete(mat_modificado.codigo_matricula)
+            self.save(mat_modificado)
             
             return True
