@@ -1,0 +1,43 @@
+from model.entidades import Aluno
+
+class AlunoService:
+
+    def __init__(self, gerenciador_alunos):
+        self.gerenciador_alunos = gerenciador_alunos
+
+    #CRUD BÁSICO
+    def cadastrar_aluno(self, codigo, nome, data_nascimento, peso, altura):
+        if self.gerenciador_alunos.findById(codigo) is not None:
+            raise ValueError(f"Erro: O codigo {codigo} já está em uso por outro aluno!")
+        novo_aluno = Aluno(codigo, nome, data_nascimento, peso, altura)
+        self.gerenciador_alunos.save(novo_aluno)
+        return True
+
+    def listar_alunos(self):
+        alunos = self.gerenciador_alunos.findAll()
+        if not alunos:
+            raise ValueError(f"Não existem alunos cadastrados no sistema.")
+        return alunos
+
+    def buscar_cod(self, codigo):
+        aluno = self.gerenciador_alunos.findById(codigo) 
+        if aluno is None:
+            raise ValueError(f"Erro: Nenhum aluno encontrado no sistema com o código: {codigo}")
+        return aluno
+
+    def excluir(self, codigo):
+        self.buscar_cod(codigo)
+        self.gerenciador_alunos.delete(codigo)
+
+    def atualizar(self, codigo, nome, data_nascimento, peso, altura):
+        self.buscar_cod(codigo)
+        aluno_modificado = Aluno(codigo, nome, data_nascimento, peso, altura)
+        self.gerenciador_alunos.update(aluno_modificado)
+        
+    
+    
+
+        
+
+
+    

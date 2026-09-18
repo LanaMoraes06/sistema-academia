@@ -57,7 +57,25 @@ class Aluno:
             raise ValueError ("A altura deve ser maior que 0!")
             
         self._altura = altura_convertida
+    
+    @property
+    def imc(self):
+        valor_imc = self.peso / (self.altura ** 2)
+        return round(valor_imc, 2)  
+
+    @property
+    def classificacao_imc(self):
+        valor = self.imc
         
+        if valor < 18.5:
+            return "Abaixo do peso"
+        elif 18.5 <= valor < 24.9:
+            return "Peso normal"
+        elif 25.0 <= valor < 29.9:
+            return "Sobrepeso"
+        else:
+            return "Obesidade"
+            
         
 class Professor: 
     def __init__(self, codigo_prof, nome, endereco, telefone):
