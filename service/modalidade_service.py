@@ -8,6 +8,7 @@ class ModalidadeService:
         self.gerenciador_matricula = gerenciador_matricula
 
 
+
     def cadastrar_modalidade(self, codigo_modalidade, descricao, codigo_prof, valor_aula, limite_alunos, total_alunos):
         if self.gerenciador_modalidade.findById(codigo_modalidade) is not None:
             raise ValueError(f"Erro: O codigo {codigo_modalidade} já está em uso por outra modalidade!")

@@ -6,10 +6,10 @@ class ProfessorService:
         self.gerenciador_prof = gerenciador_prof
 
     #CRUD BÁSICO
-    def cadastrar_professor(self, codigo, nome, endereco, telefone):
-        if self.gerenciador_prof.findById(codigo) is not None:
-            raise ValueError(f"Erro: O codigo {codigo} já está em uso por outro professor!")
-        novo_professor = Professor(codigo, nome, endereco, telefone)
+    def cadastrar_professor(self, codigo_prof, nome, endereco, telefone):
+        if self.gerenciador_prof.findById(codigo_prof) is not None:
+            raise ValueError(f"Erro: O código {codigo_prof} já está em uso por outro professor!")
+        novo_professor = Professor(codigo_prof, nome, endereco, telefone)
         self.gerenciador_prof.save(novo_professor)
         return True
 
@@ -19,17 +19,17 @@ class ProfessorService:
             raise ValueError(f"Não existem professores cadastrados no sistema.")
         return professores
 
-    def buscar_cod(self, codigo):
-        professor = self.gerenciador_prof.findById(codigo) 
+    def buscar_cod(self, codigo_prof):
+        professor = self.gerenciador_prof.findById(codigo_prof) 
         if professor is None:
-            raise ValueError(f"Erro: Nenhum professor encontrado no sistema com o código: {codigo}")
+            raise ValueError(f"Erro: Nenhum professor encontrado no sistema com o código: {codigo_prof}")
         return professor
 
-    def excluir(self, codigo):
-        self.buscar_cod(codigo)
-        self.gerenciador_prof.delete(codigo)
+    def excluir(self, codigo_prof):
+        self.buscar_cod(codigo_prof)
+        self.gerenciador_prof.delete(codigo_prof)
 
-    def atualizar(self, codigo, nome, endereco, telefone):
-        self.buscar_cod(codigo)
-        professor_modificado = Professor(codigo, nome, endereco, telefone)
+    def atualizar(self, codigo_prof, nome, endereco, telefone):
+        self.buscar_cod(codigo_prof)
+        professor_modificado = Professor(codigo_prof, nome, endereco, telefone)
         self.gerenciador_prof.update(professor_modificado)
