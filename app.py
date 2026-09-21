@@ -130,10 +130,8 @@ elif opcao == "Alunos":
                             st.markdown(f"**IMC:** {a.classificacao_imc}")
                             
                         with col_botoes:
-                            # CORREÇÃO: Usando 'a.codigo_aluno'
                             btn_editar = st.button("✏️ Editar", key=f"btn_edit_{a.codigo_aluno}", use_container_width=True)
                             if st.button("🗑️ Excluir", key=f"btn_del_{a.codigo_aluno}", type="primary", use_container_width=True):
-                                # CORREÇÃO: Usando 'servico_aluno'
                                 servico_aluno.excluir(a.codigo_aluno)
                                 st.rerun()
     

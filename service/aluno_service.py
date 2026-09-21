@@ -1,4 +1,4 @@
-from model.entidades import Aluno
+from model.aluno import Aluno
 
 class AlunoService:
 

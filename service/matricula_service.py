@@ -1,4 +1,6 @@
-from model.entidades import Matricula, Aluno, Modalidade
+from model.matricula import Matricula
+from model.aluno import Aluno
+from model.modalidade import Modalidade
 
 class MatriculaService:
     def __init__(self, gerenciador_mat, gerenciador_aluno, gerenciador_mod):

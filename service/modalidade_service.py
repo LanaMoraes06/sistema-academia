@@ -1,4 +1,6 @@
-from model.entidades import Modalidade, Professor, Matricula
+from model.modalidade import Modalidade
+from model.professor import Professor
+from model.matricula import Matricula
 
 class ModalidadeService:
 

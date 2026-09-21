@@ -1,4 +1,4 @@
-from model.entidades import Professor
+from model.professor import Professor
 
 class ProfessorService:
 
