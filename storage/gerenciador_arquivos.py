@@ -1,6 +1,6 @@
 import os
-from estruturas.arvore_binaria import ArvoreBinaria
-from modelos.entidades import Aluno, Professor, Modalidade, Matricula
+from structure.arvore_binaria import ArvoreBinaria
+from model.entidades import Aluno, Professor, Modalidade, Matricula
 
 class GerenciadorAlunos:
     def __init__(self, caminho_arquivo="data/alunos.txt"):
