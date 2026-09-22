@@ -15,10 +15,11 @@ gen_mat = GerenciadorMatricula()
 servico_aluno = AlunoService(gen_aluno)
 servico_prof = ProfessorService(gen_prof)
 servico_mod = ModalidadeService(gen_mod, gen_prof, gen_mat)
+servico_mat = MatriculaService(gen_mat, gen_aluno, gen_mod)
 
 st.set_page_config(page_title="Sistema de Academia", page_icon="💪")
 st.sidebar.title("FitFema")
-opcao = st.sidebar.selectbox("Escolha uma área:", ["Alunos", "Professores", "Modalidades", "Faturamento"])
+opcao = st.sidebar.selectbox("Escolha uma área:", ["Alunos", "Professores", "Modalidades", "Matrículas", "Faturamento"])
 
 # TELA DE PROFESSORES
 if opcao == "Professores":
@@ -165,14 +166,16 @@ elif opcao == "Alunos":
                             col_form1, col_form2 = st.columns(2)
                             with col_form1:
                                 novo_nome = st.text_input("Nome", value=a.nome, key=f"upd_nome_{a.codigo_aluno}")
-                                novo_peso = st.number_input("Peso (kg)", value=float(a.peso), key=f"upd_peso_{a.codigo_aluno}", format="%.1f")
+                                nova_data = st.text_input("Data de Nascimento", value=str(a.data_nascimento), key=f"upd_data_{a.codigo_aluno}")
+                                
                             with col_form2:
+                                novo_peso = st.number_input("Peso (kg)", value=float(a.peso), key=f"upd_peso_{a.codigo_aluno}", format="%.1f")
                                 nova_altura = st.number_input("Altura (m)", value=float(a.altura), key=f"upd_altura_{a.codigo_aluno}", format="%.2f")
                             
                             c_salvar, c_cancelar, _ = st.columns([2, 2, 6])
                             if c_salvar.button("✔️ Salvar", type="secondary", key=f"save_{a.codigo_aluno}", use_container_width=True):
                             
-                                servico_aluno.atualizar(a.codigo_aluno, novo_nome, novo_peso, nova_altura)
+                                servico_aluno.atualizar(a.codigo_aluno, novo_nome, nova_data, novo_peso, nova_altura)
                                 st.session_state[f"editando_{a.codigo_aluno}"] = False
                                 st.rerun()
                                 
@@ -187,7 +190,7 @@ elif opcao == "Alunos":
 elif opcao == "Modalidades":
     st.header("Gestão de Modalidades")
     
-    aba_listar, aba_cadastrar = st.tabs(["Lista de Modalidades", "Cadastrar Nova"])
+    aba_listar, aba_cadastrar = st.tabs(["Lista de Modalidades", "Cadastrar Nova Modalidade"])
     
     with aba_listar:
         pesquisa = st.text_input("", placeholder="Ex: 1", key="pesq_mod")
@@ -288,8 +291,107 @@ elif opcao == "Modalidades":
     
 
 
-# TELA DE FATURAMENTO                                
 
+
+# TELA DE MATRÍCULAS
+elif opcao == "Matrículas":
+    st.header("Gestão de Matrículas")
+    
+    aba_listar, aba_cadastrar = st.tabs(["Lista de Matrículas", "Nova Matrícula"])
+    
+    with aba_listar:
+        pesquisa = st.text_input("", placeholder="Ex: 1", key="pesq_mat")
+        
+        try:
+            matriculas = servico_mat.listar_matriculas()
+            
+            if pesquisa:
+                try:
+                    codigo_busca = int(pesquisa)
+                    matriculas = [m for m in matriculas if int(m.codigo_matricula) == codigo_busca]
+                except ValueError:
+                    st.warning("⚠️ Digite apenas números para pesquisar.")
+                    matriculas = []
+
+            for m in matriculas:
+                # Tenta buscar os nomes para a interface ficar amigável
+                try:
+                    nome_aluno = servico_aluno.buscar_cod(m.codigo_aluno).nome
+                except:
+                    nome_aluno = f"ID {m.codigo_aluno}"
+                    
+                try:
+                    desc_mod = servico_mod.buscar_cod(m.codigo_modalidade).descricao
+                except:
+                    desc_mod = f"Mod. {m.codigo_modalidade}"
+
+                with st.expander(f" Matrícula #{m.codigo_matricula} — **{nome_aluno}**"):
+                    col_info, col_botoes = st.columns([3, 1])
+                    
+                    with col_info:
+                        st.markdown(f"**Modalidade:** {desc_mod}")
+                        st.markdown(f"**Quantidade de Aulas:** {m.qtd_aulas}")
+                        
+                    with col_botoes:
+                        btn_editar = st.button("✏️ Editar", key=f"btn_edit_mat_{m.codigo_matricula}", use_container_width=True)
+                        if st.button("🗑️ Excluir", key=f"btn_del_mat_{m.codigo_matricula}", type="primary", use_container_width=True):
+                            # Aqui a sua regra 3.4 do backend já vai rodar e devolver a vaga automaticamente!
+                            servico_mat.excluir(m.codigo_matricula)
+                            st.rerun()
+
+                    if btn_editar or st.session_state.get(f"editando_mat_{m.codigo_matricula}", False):
+                        st.session_state[f"editando_mat_{m.codigo_matricula}"] = True 
+                        
+                        st.divider()
+                        st.markdown("##### ⚙️ Atualizar Matrícula")
+                        
+                        c1, c2, c3 = st.columns(3)
+                        with c1:
+                            novo_aluno = st.number_input("Cód. Aluno", value=int(m.codigo_aluno), step=1, key=f"upd_mat_aluno_{m.codigo_matricula}")
+                        with c2:
+                            nova_mod = st.number_input("Cód. Modalidade", value=int(m.codigo_modalidade), step=1, key=f"upd_mat_mod_{m.codigo_matricula}")
+                        with c3:
+                            nova_qtd = st.number_input("Qtd. Aulas", value=int(m.qtd_aulas), step=1, min_value=1, key=f"upd_mat_qtd_{m.codigo_matricula}")
+                        
+                        c_salvar, c_cancelar, _ = st.columns([2, 2, 6])
+                        if c_salvar.button("✔️ Salvar", type="secondary", key=f"save_mat_{m.codigo_matricula}", use_container_width=True):
+                            servico_mat.atualizar(m.codigo_matricula, novo_aluno, nova_mod, nova_qtd)
+                            st.session_state[f"editando_mat_{m.codigo_matricula}"] = False
+                            st.rerun()
+                            
+                        if c_cancelar.button("❌ Cancelar", key=f"cancel_mat_{m.codigo_matricula}", use_container_width=True):
+                            st.session_state[f"editando_mat_{m.codigo_matricula}"] = False
+                            st.rerun()
+
+        except ValueError as erro:
+            st.warning(str(erro))
+
+    with aba_cadastrar:
+        with st.form("form_matricula", clear_on_submit=True):
+            st.markdown("#### Efetuar Nova Matrícula")
+            
+            c_mat, c_aluno = st.columns(2)
+            with c_mat:
+                codigo_matricula = st.number_input("Código da Matrícula", min_value=1, step=1)
+            with c_aluno:
+                codigo_aluno = st.number_input("Código do Aluno", min_value=1, step=1)
+                
+            c_mod, c_qtd = st.columns(2)
+            with c_mod:
+                codigo_mod = st.number_input("Código da Modalidade", min_value=1, step=1)
+            with c_qtd:
+                qtd_aulas = st.number_input("Quantidade de Aulas", min_value=1, step=1)
+                
+            btn_salvar = st.form_submit_button("Confirmar Matrícula")
+            
+            if btn_salvar:
+                try:
+                    servico_mat.realizar_matricula(codigo_matricula, codigo_aluno, codigo_mod, qtd_aulas)
+                    st.success("Matrícula realizada com sucesso! A vaga foi computada.")
+                except ValueError as erro:
+                    st.error(str(erro))
+
+# TELA DE FATURAMENTO                                
 elif opcao == "Faturamento":
     st.header("Relatório de Faturamento por Modalidade")
     
