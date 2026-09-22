@@ -18,7 +18,6 @@ servico_mod = ModalidadeService(gen_mod, gen_prof, gen_mat)
 
 st.set_page_config(page_title="Sistema de Academia", page_icon="💪")
 st.sidebar.title("FitFema")
-st.image
 opcao = st.sidebar.selectbox("Escolha uma área:", ["Alunos", "Professores", "Modalidades", "Faturamento"])
 
 # TELA DE PROFESSORES
@@ -30,8 +29,19 @@ if opcao == "Professores":
                  
     with aba_listar:
         try:
-            professores = servico_prof.listar_professores()
-            for p in professores:
+            
+            pesquisa = st.text_input("", placeholder="Digite o código do professor")
+            professor = servico_prof.listar_professores()           
+            if pesquisa:
+                try:
+                    codigo_busca = int(pesquisa)
+                    professor = [p for p in professor if int(p.codigo_prof) == codigo_busca]
+                except ValueError:
+                    st.warning("⚠️ Digite apenas números para pesquisar pelo código.")
+                    professor = []
+            if not professor and pesquisa:
+                st.info(f"Nenhum professor encontrado com o código {pesquisa}.")
+            for p in professor:
                 
                 with st.expander(f"👤 #{p.codigo_prof} — **{p.nome}**"):
                     
@@ -50,8 +60,8 @@ if opcao == "Professores":
                     if btn_editar or st.session_state.get(f"editando_{p.codigo_prof}", False):
                         st.session_state[f"editando_{p.codigo_prof}"] = True 
                         
-                        st.divider() # Cria uma linha sutil de separação
-                        st.markdown("##### ⚙️ Atualizar Dados")
+                        st.divider() 
+                        st.markdown("#####  Atualizar Dados")
                         
                         col_form1, col_form2 = st.columns(2)
                         with col_form1:
@@ -60,7 +70,7 @@ if opcao == "Professores":
                         with col_form2:
                             novo_end = st.text_input("Endereço", value=p.endereco, key=f"upd_end_{p.codigo_prof}")
                             
-                        # Botões do formulário de edição
+                        
                         c_salvar, c_cancelar, _ = st.columns([2, 2, 6])
                         if c_salvar.button("✔️ Salvar", type="secondary", key=f"save_{p.codigo_prof}", use_container_width=True):
                             servico_prof.atualizar(p.codigo_prof, novo_nome, novo_end, novo_tel)
@@ -116,7 +126,18 @@ elif opcao == "Alunos":
                     
     with aba_listar:
             try:
-                alunos = servico_aluno.listar_alunos()
+                pesquisa = st.text_input("", placeholder="Digite o código do aluno")
+                alunos = servico_aluno.listar_alunos()            
+                if pesquisa:
+                    try:
+                        codigo_busca = int(pesquisa)
+                        alunos = [a for a in alunos if int(a.codigo_aluno) == codigo_busca]
+                    except ValueError:
+                        st.warning("⚠️ Digite apenas números para pesquisar pelo código.")
+                        alunos = []
+
+                if not alunos and pesquisa:
+                    st.info(f"Nenhum aluno encontrado com o código {pesquisa}.")
                 for a in alunos:
                     
                     with st.expander(f"👤 #{a.codigo_aluno} — **{a.nome}**"):
