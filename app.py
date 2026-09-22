@@ -335,7 +335,6 @@ elif opcao == "Matrículas":
                     with col_botoes:
                         btn_editar = st.button("✏️ Editar", key=f"btn_edit_mat_{m.codigo_matricula}", use_container_width=True)
                         if st.button("🗑️ Excluir", key=f"btn_del_mat_{m.codigo_matricula}", type="primary", use_container_width=True):
-                            # Aqui a sua regra 3.4 do backend já vai rodar e devolver a vaga automaticamente!
                             servico_mat.excluir(m.codigo_matricula)
                             st.rerun()
 

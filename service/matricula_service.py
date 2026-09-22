@@ -18,14 +18,13 @@ class MatriculaService:
         if modalidade is None:
             raise ValueError("Erro: Modalidade não encontrada")
 
-
-        if modalidade.total_alunos >= modalidade.limite_alunos:
+        if int(modalidade.total_alunos) >= int(modalidade.limite_alunos):
             raise ValueError(f"Erro: A modalidade {modalidade.descricao} já atingiu o limite de {modalidade.limite_alunos} alunos")
         
         nova_matricula = Matricula(codigo_mat, codigo_aluno, codigo_mod, qtd_aulas)
         self.gerenciador_mat.save(nova_matricula)
 
-        modalidade.total_alunos += 1
+        modalidade.total_alunos = int(modalidade.total_alunos) + 1
         self.gerenciador_mod.update(modalidade)        
         return True
 
@@ -41,13 +40,20 @@ class MatriculaService:
             raise ValueError(f"Erro: Nenhuma matricula encontrado no sistema com o código: {codigo_mat}")
         return matricula
 
-    def excluir(self, codigo_mat):
-        self.buscar_cod(codigo_mat)
-        self.gerenciador_mat.delete(codigo_mat)
+    def excluir(self, codigo_matricula):
+        matricula_excluida = self.gerenciador_mat.findById(codigo_matricula)
+        
+        if not matricula_excluida:
+            raise ValueError("Matrícula não encontrada.")
+            
+        self.gerenciador_mat.delete(codigo_matricula)
+        
         modalidade = self.gerenciador_mod.findById(matricula_excluida.codigo_modalidade)
-        if modalidade is not None:
-            modalidade.total_alunos -= 1
+        
+        if modalidade:
+            modalidade.total_alunos = int(modalidade.total_alunos) - 1
             self.gerenciador_mod.update(modalidade)
+
 
     def atualizar(self, codigo_mat, codigo_aluno, codigo_mod, qtd_aulas):
         self.buscar_cod(codigo_mat)

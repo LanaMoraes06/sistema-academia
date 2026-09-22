@@ -261,7 +261,7 @@ class GerenciadorMatricula:
             self.arvore.inserir_no(mat.codigo_matricula, posicao)
 
     def findById(self, codigo_matricula):
-        posicao = self.arvore.buscar(codigo_matricula)
+        posicao = self.arvore.buscar(int(codigo_matricula))
 
         if posicao is None:
             return None
