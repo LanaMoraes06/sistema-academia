@@ -89,7 +89,7 @@ if opcao == "Professores":
             codigo = st.number_input("Código do Professor", min_value=1, step=1)
             nome = st.text_input("Nome")
             endereco = st.text_input("Endereço")
-            telefone = st.text_input("Telefone")
+            telefone = st.text_input("Telefone", max_chars=11)
             
             btn_salvar = st.form_submit_button("Salvar Professor")
             
@@ -183,11 +183,108 @@ elif opcao == "Alunos":
             except ValueError as erro:
                 st.warning(str(erro))
 
-# TELA DE MODALIDADES (Molde inicial)
+# TELA DE MODALIDADES 
 elif opcao == "Modalidades":
     st.header("Gestão de Modalidades")
-    aba_listar, aba_cadastrar = st.tabs(["Lista de Modalidades", "Cadastrar Novo"])
     
+    aba_listar, aba_cadastrar = st.tabs(["Lista de Modalidades", "Cadastrar Nova"])
+    
+    with aba_listar:
+        pesquisa = st.text_input("", placeholder="Ex: 1", key="pesq_mod")
+        
+        try:
+            modalidades = servico_mod.listar_modalidade()
+            
+            if pesquisa:
+                try:
+                    codigo_busca = int(pesquisa)
+                    modalidades = [m for m in modalidades if int(m.codigo_modalidade) == codigo_busca]
+                except ValueError:
+                    st.warning("⚠️ Digite apenas números para pesquisar pelo código.")
+                    modalidades = []
+
+            if not modalidades and pesquisa:
+                st.info(f"Nenhuma modalidade encontrada com o código {pesquisa}.")
+
+            for m in modalidades:
+                with st.expander(f" #{m.codigo_modalidade} — **{m.descricao}**"):
+                    col_info, col_botoes = st.columns([3, 1])
+                    
+                    with col_info:
+                        try:
+                            prof = servico_prof.buscar_cod(m.codigo_prof)
+                            nome_exibicao = prof.nome
+                        except:
+                            nome_exibicao = f"Código {m.codigo_prof}"
+
+                        st.markdown(f"**Professor Responsável:** {nome_exibicao}")
+                        st.markdown(f"**Valor da Aula:** R$ {float(m.valor_aula):.2f}")
+                        st.markdown(f"**Ocupação:** {m.total_alunos} de {m.limite_alunos} alunos")
+                        
+                    with col_botoes:
+                        btn_editar = st.button("✏️ Editar", key=f"btn_edit_mod_{m.codigo_modalidade}", use_container_width=True)
+                        if st.button("🗑️ Excluir", key=f"btn_del_mod_{m.codigo_modalidade}", type="primary", use_container_width=True):
+                            servico_mod.excluir(m.codigo_modalidade)
+                            st.rerun()
+
+                    # Formulário de Edição
+                    if btn_editar or st.session_state.get(f"editando_mod_{m.codigo_modalidade}", False):
+                        st.session_state[f"editando_mod_{m.codigo_modalidade}"] = True 
+                        
+                        st.divider()
+                        st.markdown("##### Atualizar Dados da Modalidade")
+                        
+                        col_f1, col_f2 = st.columns(2)
+                        with col_f1:
+                            nova_desc = st.text_input("Descrição", value=m.descricao, key=f"upd_desc_{m.codigo_modalidade}")
+                            novo_prof = st.number_input("Código do Professor", value=int(m.codigo_prof), step=1, key=f"upd_prof_{m.codigo_modalidade}")
+                        with col_f2:
+                            novo_valor = st.number_input("Valor (R$)", value=float(m.valor_aula), min_value=0.0, format="%.2f", key=f"upd_val_{m.codigo_modalidade}")
+                            novo_limite = st.number_input("Limite de Alunos", value=int(m.limite_alunos), min_value=1, step=1, key=f"upd_lim_{m.codigo_modalidade}")
+                        
+                        c_salvar, c_cancelar, _ = st.columns([2, 2, 6])
+                        if c_salvar.button("✔️ Salvar", type="secondary", key=f"save_mod_{m.codigo_modalidade}", use_container_width=True):
+                            # Nota: Passamos o m.total_alunos original para não perder a contagem de quem já está matriculado!
+                            servico_mod.atualizar(m.codigo_modalidade, nova_desc, novo_prof, novo_valor, novo_limite, m.total_alunos)
+                            st.session_state[f"editando_mod_{m.codigo_modalidade}"] = False
+                            st.rerun()
+                            st.rerun()
+
+        except ValueError as erro:
+            st.warning(str(erro))
+
+    with aba_cadastrar:
+        st.markdown("#### Vincular Professor")
+        cod_prof = st.number_input("Digite o Código do Professor responsável:", min_value=0, step=1, key="cad_mod_prof")
+        
+        if cod_prof > 0:
+            try:
+                prof = servico_prof.buscar_cod(cod_prof)
+                st.success(f"Professor responsável: **{prof.nome}**")
+                
+                with st.form("form_modalidade", clear_on_submit=True):
+                    st.markdown("#### Dados da Modalidade")
+                    
+                    codigo = st.number_input("Código da Modalidade", min_value=1, step=1)
+                    descricao = st.text_input("Descrição (Ex: Musculação, Pilates)")
+                    
+                    c1, c2 = st.columns(2)
+                    with c1:
+                        valor = st.number_input("Valor da Aula (R$)", min_value=0.0, step=10.0, format="%.2f")
+                    with c2:
+                        limite = st.number_input("Limite Máximo de Alunos", min_value=1, step=1)
+                    
+                    btn_salvar = st.form_submit_button("Salvar Modalidade")
+                    
+                    if btn_salvar:
+                        try:
+                            servico_mod.cadastrar_modalidade(codigo, descricao, cod_prof, valor, limite, total_alunos=0)
+                            st.success(f"A modalidade {descricao} foi cadastrada com sucesso!")
+                        except ValueError as erro:
+                            st.error(str(erro))
+                            
+            except ValueError:
+                st.warning("⚠️ Não encontramos nenhum professor com este código. Por favor, verifique.")
     
 
 
