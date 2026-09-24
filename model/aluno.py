@@ -73,5 +73,9 @@ class Aluno:
             return "Peso normal"
         elif 25.0 <= valor < 29.9:
             return "Sobrepeso"
+        elif 30.0 <= valor < 34.9:
+            return "Obesidade grau I"
+        elif 35.0 <= valor < 39.9:
+            return "Obesidade grau II"
         else:
-            return "Obesidade"
+            return "Obesidade grau III"
