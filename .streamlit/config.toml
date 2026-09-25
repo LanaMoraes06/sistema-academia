@@ -1,0 +1,16 @@
+[theme]
+# Cor do destaque (Botões principais, abas e sliders)
+primaryColor = "#FF6200"
+
+# Cor do fundo da tela principal
+backgroundColor = "#35312f"
+
+# Cor de fundo do menu lateral e dos containers 
+secondaryBackgroundColor = "#000000"
+
+# Cor do texto principal
+textColor = "#FAFAFA"
+
+# Fonte 
+font = "sans serif"
+

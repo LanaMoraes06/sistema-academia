@@ -1,5 +1,5 @@
 import streamlit as st
-
+import base64
 from storage.gerenciador_arquivos import GerenciadorProfessor, GerenciadorModalidade, GerenciadorMatricula, GerenciadorUsuarios
 from service.professor_service import ProfessorService
 from service.modalidade_service import ModalidadeService
@@ -20,39 +20,129 @@ servico_mod = ModalidadeService(gen_mod, gen_prof, gen_mat)
 servico_mat = MatriculaService(gen_mat, gen_aluno, gen_mod)
 servico_usuario = UsuarioService(gen_usuario)
 
-st.set_page_config(page_title="Sistema de Academia", page_icon="💪")
+
+def definir_fundo_login(caminho_imagem):
+    try:
+        with open(caminho_imagem, "rb") as ficheiro:
+            imagem_base64 = base64.b64encode(ficheiro.read()).decode()
+        
+        estilo = f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{imagem_base64}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }}
+        
+       
+        </style>
+        """
+        st.markdown(estilo, unsafe_allow_html=True)
+
+    except FileNotFoundError:
+        st.warning("⚠️ Imagem de fundo não encontrada no caminho especificado.")
+
+
+st.set_page_config(
+    page_title="Sistema de Academia",
+    page_icon="💪",
+    layout="wide")
+st.markdown("""
+<style>
+    .block-container {
+        padding-top: 2rem;
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+    
+    [data-testid="column"] {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+</style>
+""", unsafe_allow_html=True)
 if 'autenticado' not in st.session_state:
     st.session_state['autenticado'] = False
 
 
 if not st.session_state['autenticado']:
-    st.title("🔐 Login - FitFema")
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
+
+    st.session_state['autenticado'] = False
+    st.session_state['perfil_usuario'] = ""
+    st.session_state['nome_usuario'] = ""
+
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        st.image(
+            "img/login.png",
+            use_container_width=True
+        )
     with col2:
+
+        st.markdown(
+            """
+            <div style="
+                margin-top: 120px;
+                text-align: center;
+            ">
+                <h1>Acesse o Sistema</h1>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
         with st.form("form_login"):
-            st.markdown("#### Acesse o Sistema")
+
             login_digitado = st.text_input("Usuário")
-            senha_digitada = st.text_input("Senha", type="password")
-            btn_entrar = st.form_submit_button("Entrar", use_container_width=True)
-            
+
+            senha_digitada = st.text_input(
+                "Senha",
+                type="password"
+            )
+
+            btn_entrar = st.form_submit_button(
+                "Entrar",
+                use_container_width=True
+            )
+
             if btn_entrar:
                 try:
-                    usuario_logado = servico_usuario.autenticar_usuario(login_digitado, senha_digitada)
-                    
+                    usuario_logado = servico_usuario.autenticar_usuario(
+                        login_digitado,
+                        senha_digitada
+                    )
+
                     st.session_state['autenticado'] = True
                     st.session_state['perfil_usuario'] = usuario_logado.perfil
                     st.session_state['nome_usuario'] = usuario_logado.login
+
                     st.rerun()
+
+                except ValueError as erro:
+                    st.error(str(erro))
                     
                 except ValueError as erro:
                     st.error(str(erro))
-
 else:
    
-    st.sidebar.title("FitFema")
-    opcao = st.sidebar.selectbox("Escolha uma área:", ["Alunos", "Professores", "Modalidades", "Matrículas", "Faturamento"])
+    st.sidebar.image("img/icon.png", use_container_width=True)
+    st.sidebar.markdown(f"Olá **{st.session_state['nome_usuario']}** !")
+    if st.sidebar.button("Sair"):
+        st.session_state['autenticado'] = False
+        st.rerun()
+        
+    st.sidebar.divider()
+    opcoes_menu = ["Alunos", "Modalidades", "Matrículas"]
+    
+    if st.session_state.get('perfil_usuario') == "Administrador":
+        opcoes_menu.append("Faturamento")
+        opcoes_menu.append("Professores")
+    
+    opcao = st.sidebar.selectbox("Escolha uma área:", opcoes_menu)
 
     # TELA DE PROFESSORES
     if opcao == "Professores":
