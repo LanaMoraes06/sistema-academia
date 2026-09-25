@@ -1,0 +1,2 @@
+1;lana;123;Administrador
+2;joao;senha1;Recepcionista
