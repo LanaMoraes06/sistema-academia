@@ -314,7 +314,6 @@ elif opcao == "Matrículas":
                     matriculas = []
 
             for m in matriculas:
-                # Tenta buscar os nomes para a interface ficar amigável
                 try:
                     nome_aluno = servico_aluno.buscar_cod(m.codigo_aluno).nome
                 except:
@@ -393,6 +392,7 @@ elif opcao == "Matrículas":
 # TELA DE FATURAMENTO                                
 elif opcao == "Faturamento":
     st.header("Relatório de Faturamento por Modalidade")
+    
     
     with st.form("form_faturamento"):
         cod_mod = st.number_input("Digite o Código da Modalidade", min_value=1, step=1)

@@ -4,6 +4,7 @@ from model.professor import Professor
 from model.matricula import Matricula
 from model.aluno import Aluno
 from model.modalidade import Modalidade
+from model.usuario import Usuario
 
 
 class GerenciadorAlunos:
@@ -310,3 +311,23 @@ class GerenciadorMatricula:
             self.save(mat_modificado)
             
             return True
+
+class GerenciadorUsuarios:
+    def __init__(self, caminho_arquivo="data/usuarios.txt"):
+        self.arquivo = caminho_arquivo
+
+    def findByLogin(self, login_buscado):
+        if not os.path.exists(self.arquivo):
+            return None
+
+        with open(self.arquivo, "r", encoding="utf-8") as f:
+            for linha in f:
+                dados = linha.strip().split(';')
+                
+                if len(dados) == 4:
+                    codigo, login, senha, perfil = dados
+                    
+                    if login == login_buscado:
+                        return Usuario(int(codigo), login, senha, perfil)
+                        
+        return None
