@@ -1,0 +1,8 @@
+[
+    {
+        "codigo": 1,
+        "login": "admin",
+        "senha": "123",
+        "perfil": "Administrador"
+    }
+]

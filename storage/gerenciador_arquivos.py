@@ -1,333 +1,324 @@
 import os
-from structure.arvore_binaria import ArvoreBinaria
+import json
 from model.professor import Professor
 from model.matricula import Matricula
 from model.aluno import Aluno
 from model.modalidade import Modalidade
 from model.usuario import Usuario
 
-
 class GerenciadorAlunos:
-    def __init__(self, caminho_arquivo="data/alunos.txt"):
+    def __init__(self, caminho_arquivo="data/alunos.json"):
         self.arquivo = caminho_arquivo
-        self.arvore = ArvoreBinaria()
-        self._carregar_indices() #ele reconstroi a arvore
-                                                                                #"a" = append, adicionar
-    def _carregar_indices(self):                                                #"r" read, ler
-        with open(self.arquivo, "a+", encoding="utf-8") as f:
-            f.seek(0) 
-            posicao_atual = f.tell() 
-            linha = f.readline()
-            while linha:
-                dados = linha.strip().split(';')
-                codigo_aluno = int(dados[0])
-                self.arvore.inserir_no(codigo_aluno, posicao_atual)
-                posicao_atual = f.tell() 
-                linha = f.readline()
-    
-    def save(self, aluno: Aluno):                            
-        with open(self.arquivo, "a", encoding="utf-8") as f:
-            posicao = f.tell()
-            linha_texto = f"{aluno.codigo_aluno};{aluno.nome};{aluno.data_nascimento};{aluno.peso};{aluno.altura}\n"
-            f.write(linha_texto)
-            self.arvore.inserir_no(aluno.codigo_aluno, posicao)
+        self._inicializar_arquivo()
+
+    def _inicializar_arquivo(self):
+        if not os.path.exists(self.arquivo):
+            with open(self.arquivo, "w", encoding="utf-8") as f:
+                json.dump([], f)
+
+    def _ler_dados(self):
+        try:
+            with open(self.arquivo, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            return []
+
+    def _salvar_dados(self, dados):
+        with open(self.arquivo, "w", encoding="utf-8") as f:
+            json.dump(dados, f, indent=4, ensure_ascii=False)
+
+    def save(self, aluno: Aluno):
+        dados = self._ler_dados()
+        aluno_dict = {
+            "codigo_aluno": int(aluno.codigo_aluno),
+            "nome": aluno.nome,
+            "data_nascimento": str(aluno.data_nascimento),
+            "peso": float(aluno.peso),
+            "altura": float(aluno.altura)
+        }
+        dados.append(aluno_dict)
+        self._salvar_dados(dados)
 
     def findById(self, codigo_aluno):
-        posicao = self.arvore.buscar(codigo_aluno)
-
-        if posicao is None:
-            return None
-        
-        with open(self.arquivo, "r", encoding="utf-8") as f:
-            f.seek(posicao)
-            linha = f.readline().strip()
-            dados = linha.split(';')
-            return Aluno(dados[0],dados[1],dados[2],dados[3],dados[4])
-
+        dados = self._ler_dados()
+        for d in dados:
+            if d["codigo_aluno"] == int(codigo_aluno):
+                return Aluno(d["codigo_aluno"], d["nome"], d["data_nascimento"], d["peso"], d["altura"])
+        return None
 
     def findAll(self):
-        posicoes = self.arvore.obter_posicoes_em_ordem()
-        alunos_cadastrados = []
-        with open(self.arquivo, "r", encoding="utf-8") as f:
-            for pos in posicoes:
-                f.seek(pos)
-                linha = f.readline().strip()
-                dados = linha.split(';')
-                aluno = Aluno(dados[0],dados[1],dados[2],dados[3],dados[4])
-                alunos_cadastrados.append(aluno)
-            return alunos_cadastrados
+        dados = self._ler_dados()
+        return [Aluno(d["codigo_aluno"], d["nome"], d["data_nascimento"], d["peso"], d["altura"]) for d in dados]
 
     def delete(self, codigo_aluno):
-        posicao = self.arvore.buscar(codigo_aluno)
-
-        if posicao is None:
+        dados = self._ler_dados()
+        dados_filtrados = [d for d in dados if d["codigo_aluno"] != int(codigo_aluno)]
+        
+        if len(dados) == len(dados_filtrados):
             return False
-        todos_alunos = self.findAll()
-
-        with open(self.arquivo, "w", encoding="utf-8") as f:
-            pass
-            self.arvore = ArvoreBinaria()
-
-        for aluno in todos_alunos:
-            if aluno.codigo_aluno != codigo_aluno:
-                self.save(aluno) 
-                
+            
+        self._salvar_dados(dados_filtrados)
         return True
-
 
     def update(self, aluno_modificado: Aluno):
-            if self.arvore.buscar(aluno_modificado.codigo_aluno) is None:
-                return False 
-            self.delete(aluno_modificado.codigo_aluno)
-            self.save(aluno_modificado)
-            
-            return True
+        dados = self._ler_dados()
+        atualizou = False
+        
+        for i, d in enumerate(dados):
+            if d["codigo_aluno"] == int(aluno_modificado.codigo_aluno):
+                dados[i] = {
+                    "codigo_aluno": int(aluno_modificado.codigo_aluno),
+                    "nome": aluno_modificado.nome,
+                    "data_nascimento": str(aluno_modificado.data_nascimento),
+                    "peso": float(aluno_modificado.peso),
+                    "altura": float(aluno_modificado.altura)
+                }
+                atualizou = True
+                break
+                
+        if atualizou:
+            self._salvar_dados(dados)
+        return atualizou
+
 
 class GerenciadorProfessor:
-    def __init__(self, caminho_arquivo="data/professor.txt"):
+    def __init__(self, caminho_arquivo="data/professor.json"):
         self.arquivo = caminho_arquivo
-        self.arvore = ArvoreBinaria()
-        self._carregar_indices() 
-                                                                            
-    def _carregar_indices(self):                                                
-        with open(self.arquivo, "a+", encoding="utf-8") as f:
-            f.seek(0) 
-            posicao_atual = f.tell() 
-            linha = f.readline()
-            while linha:
-                dados = linha.strip().split(';')
-                codigo_prof = int(dados[0])
-                self.arvore.inserir_no(codigo_prof, posicao_atual)
-                posicao_atual = f.tell() 
-                linha = f.readline()
-    
-    def save(self, prof: Professor):                            
-        with open(self.arquivo, "a", encoding="utf-8") as f:
-            posicao = f.tell()
-            linha_texto = f"{prof.codigo_prof};{prof.nome};{prof.endereco};{prof.telefone}\n"
-            f.write(linha_texto)
-            self.arvore.inserir_no(prof.codigo_prof, posicao)
+        self._inicializar_arquivo()
+
+    def _inicializar_arquivo(self):
+        if not os.path.exists(self.arquivo):
+            with open(self.arquivo, "w", encoding="utf-8") as f:
+                json.dump([], f)
+
+    def _ler_dados(self):
+        try:
+            with open(self.arquivo, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            return []
+
+    def _salvar_dados(self, dados):
+        with open(self.arquivo, "w", encoding="utf-8") as f:
+            json.dump(dados, f, indent=4, ensure_ascii=False)
+
+    def save(self, prof: Professor):
+        dados = self._ler_dados()
+        prof_dict = {
+            "codigo_prof": int(prof.codigo_prof),
+            "nome": prof.nome,
+            "endereco": prof.endereco,
+            "telefone": prof.telefone
+        }
+        dados.append(prof_dict)
+        self._salvar_dados(dados)
 
     def findById(self, codigo_prof):
-        posicao = self.arvore.buscar(codigo_prof)
-
-        if posicao is None:
-            return None
-        
-        with open(self.arquivo, "r", encoding="utf-8") as f:
-            f.seek(posicao)
-            linha = f.readline().strip()
-            dados = linha.split(';')
-            return Professor(dados[0],dados[1],dados[2],dados[3])
-
+        dados = self._ler_dados()
+        for d in dados:
+            if d["codigo_prof"] == int(codigo_prof):
+                return Professor(d["codigo_prof"], d["nome"], d["endereco"], d["telefone"])
+        return None
 
     def findAll(self):
-        posicoes = self.arvore.obter_posicoes_em_ordem()
-        professor_cadastrados = []
-        with open(self.arquivo, "r", encoding="utf-8") as f:
-            for pos in posicoes:
-                f.seek(pos)
-                linha = f.readline().strip()
-                dados = linha.split(';')
-                prof = Professor(dados[0],dados[1],dados[2],dados[3])
-                professor_cadastrados.append(prof)
-            return professor_cadastrados
+        dados = self._ler_dados()
+        return [Professor(d["codigo_prof"], d["nome"], d["endereco"], d["telefone"]) for d in dados]
 
     def delete(self, codigo_prof):
-        posicao = self.arvore.buscar(codigo_prof)
-
-        if posicao is None:
+        dados = self._ler_dados()
+        dados_filtrados = [d for d in dados if d["codigo_prof"] != int(codigo_prof)]
+        if len(dados) == len(dados_filtrados):
             return False
-        todos_professores = self.findAll()
-
-        with open(self.arquivo, "w", encoding="utf-8") as f:
-            pass
-            self.arvore = ArvoreBinaria()
-
-        for prof in todos_professores:
-            if prof.codigo_prof != codigo_prof:
-                self.save(prof) 
-                
+        self._salvar_dados(dados_filtrados)
         return True
-
 
     def update(self, prof_modificado: Professor):
-            if self.arvore.buscar(prof_modificado.codigo_prof) is None:
-                return False 
-            self.delete(prof_modificado.codigo_prof)
-            self.save(prof_modificado)
-            
-            return True
+        dados = self._ler_dados()
+        atualizou = False
+        for i, d in enumerate(dados):
+            if d["codigo_prof"] == int(prof_modificado.codigo_prof):
+                dados[i] = {
+                    "codigo_prof": int(prof_modificado.codigo_prof),
+                    "nome": prof_modificado.nome,
+                    "endereco": prof_modificado.endereco,
+                    "telefone": prof_modificado.telefone
+                }
+                atualizou = True
+                break
+        if atualizou:
+            self._salvar_dados(dados)
+        return atualizou
+
 
 class GerenciadorModalidade:
-    def __init__(self, caminho_arquivo="data/modalidade.txt"):
+    def __init__(self, caminho_arquivo="data/modalidade.json"):
         self.arquivo = caminho_arquivo
-        self.arvore = ArvoreBinaria()
-        self._carregar_indices() 
-                                                                            
-    def _carregar_indices(self):                                                
-        with open(self.arquivo, "a+", encoding="utf-8") as f:
-            f.seek(0) 
-            posicao_atual = f.tell() 
-            linha = f.readline()
-            while linha:
-                dados = linha.strip().split(';')
-                codigo_modalidade = int(dados[0])
-                self.arvore.inserir_no(codigo_modalidade, posicao_atual)
-                posicao_atual = f.tell() 
-                linha = f.readline()
-    
-    def save(self, mod: Modalidade):                            
-        with open(self.arquivo, "a", encoding="utf-8") as f:
-            posicao = f.tell()
-            linha_texto = f"{mod.codigo_modalidade};{mod.descricao};{mod.codigo_prof};{mod.valor_aula};{mod.limite_alunos};{mod.total_alunos}\n"
-            f.write(linha_texto)
-            self.arvore.inserir_no(mod.codigo_modalidade, posicao)
+        self._inicializar_arquivo()
+
+    def _inicializar_arquivo(self):
+        if not os.path.exists(self.arquivo):
+            with open(self.arquivo, "w", encoding="utf-8") as f:
+                json.dump([], f)
+
+    def _ler_dados(self):
+        try:
+            with open(self.arquivo, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            return []
+
+    def _salvar_dados(self, dados):
+        with open(self.arquivo, "w", encoding="utf-8") as f:
+            json.dump(dados, f, indent=4, ensure_ascii=False)
+
+    def save(self, mod: Modalidade):
+        dados = self._ler_dados()
+        mod_dict = {
+            "codigo_modalidade": int(mod.codigo_modalidade),
+            "descricao": mod.descricao,
+            "codigo_prof": int(mod.codigo_prof),
+            "valor_aula": float(mod.valor_aula),
+            "limite_alunos": int(mod.limite_alunos),
+            "total_alunos": int(mod.total_alunos)
+        }
+        dados.append(mod_dict)
+        self._salvar_dados(dados)
 
     def findById(self, codigo_modalidade):
-        posicao = self.arvore.buscar(codigo_modalidade)
-
-        if posicao is None:
-            return None
-        
-        with open(self.arquivo, "r", encoding="utf-8") as f:
-            f.seek(posicao)
-            linha = f.readline().strip()
-            dados = linha.split(';')
-            return Modalidade(dados[0],dados[1],dados[2],dados[3],dados[4],dados[5])
-
+        dados = self._ler_dados()
+        for d in dados:
+            if d["codigo_modalidade"] == int(codigo_modalidade):
+                return Modalidade(d["codigo_modalidade"], d["descricao"], d["codigo_prof"], d["valor_aula"], d["limite_alunos"], d["total_alunos"])
+        return None
 
     def findAll(self):
-        posicoes = self.arvore.obter_posicoes_em_ordem()
-        modalidade_cadastradas = []
-        with open(self.arquivo, "r", encoding="utf-8") as f:
-            for pos in posicoes:
-                f.seek(pos)
-                linha = f.readline().strip()
-                dados = linha.split(';')
-                mod = Modalidade(dados[0],dados[1],dados[2],dados[3],dados[4],dados[5])
-                modalidade_cadastradas.append(mod)
-            return modalidade_cadastradas
+        dados = self._ler_dados()
+        return [Modalidade(d["codigo_modalidade"], d["descricao"], d["codigo_prof"], d["valor_aula"], d["limite_alunos"], d["total_alunos"]) for d in dados]
 
     def delete(self, codigo_modalidade):
-        posicao = self.arvore.buscar(codigo_modalidade)
-
-        if posicao is None:
+        dados = self._ler_dados()
+        dados_filtrados = [d for d in dados if d["codigo_modalidade"] != int(codigo_modalidade)]
+        if len(dados) == len(dados_filtrados):
             return False
-        todas_modalidades = self.findAll()
-
-        with open(self.arquivo, "w", encoding="utf-8") as f:
-            pass
-            self.arvore = ArvoreBinaria()
-
-        for mod in todas_modalidades:
-            if mod.codigo_modalidade != codigo_modalidade:
-                self.save(mod) 
-                
+        self._salvar_dados(dados_filtrados)
         return True
-
 
     def update(self, mod_modificado: Modalidade):
-            if self.arvore.buscar(mod_modificado.codigo_modalidade) is None:
-                return False 
-            self.delete(mod_modificado.codigo_modalidade)
-            self.save(mod_modificado)
-            
-            return True
+        dados = self._ler_dados()
+        atualizou = False
+        for i, d in enumerate(dados):
+            if d["codigo_modalidade"] == int(mod_modificado.codigo_modalidade):
+                dados[i] = {
+                    "codigo_modalidade": int(mod_modificado.codigo_modalidade),
+                    "descricao": mod_modificado.descricao,
+                    "codigo_prof": int(mod_modificado.codigo_prof),
+                    "valor_aula": float(mod_modificado.valor_aula),
+                    "limite_alunos": int(mod_modificado.limite_alunos),
+                    "total_alunos": int(mod_modificado.total_alunos)
+                }
+                atualizou = True
+                break
+        if atualizou:
+            self._salvar_dados(dados)
+        return atualizou
 
-#
+
 class GerenciadorMatricula:
-    def __init__(self, caminho_arquivo="data/matricula.txt"):
+    def __init__(self, caminho_arquivo="data/matricula.json"):
         self.arquivo = caminho_arquivo
-        self.arvore = ArvoreBinaria()
-        self._carregar_indices() 
-                                                                            
-    def _carregar_indices(self):                                                
-        with open(self.arquivo, "a+", encoding="utf-8") as f:
-            f.seek(0) 
-            posicao_atual = f.tell() 
-            linha = f.readline()
-            while linha:
-                dados = linha.strip().split(';')
-                codigo_matricula = int(dados[0])
-                self.arvore.inserir_no(codigo_matricula, posicao_atual)
-                posicao_atual = f.tell() 
-                linha = f.readline()
-    
-    def save(self, mat: Matricula):                            
-        with open(self.arquivo, "a", encoding="utf-8") as f:
-            posicao = f.tell()
-            linha_texto = f"{mat.codigo_matricula};{mat.codigo_aluno};{mat.codigo_modalidade};{mat.qtd_aulas}\n"
-            f.write(linha_texto)
-            self.arvore.inserir_no(mat.codigo_matricula, posicao)
+        self._inicializar_arquivo()
+
+    def _inicializar_arquivo(self):
+        if not os.path.exists(self.arquivo):
+            with open(self.arquivo, "w", encoding="utf-8") as f:
+                json.dump([], f)
+
+    def _ler_dados(self):
+        try:
+            with open(self.arquivo, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            return []
+
+    def _salvar_dados(self, dados):
+        with open(self.arquivo, "w", encoding="utf-8") as f:
+            json.dump(dados, f, indent=4, ensure_ascii=False)
+
+    def save(self, mat: Matricula):
+        dados = self._ler_dados()
+        mat_dict = {
+            "codigo_matricula": int(mat.codigo_matricula),
+            "codigo_aluno": int(mat.codigo_aluno),
+            "codigo_modalidade": int(mat.codigo_modalidade),
+            "qtd_aulas": int(mat.qtd_aulas)
+        }
+        dados.append(mat_dict)
+        self._salvar_dados(dados)
 
     def findById(self, codigo_matricula):
-        posicao = self.arvore.buscar(int(codigo_matricula))
-
-        if posicao is None:
-            return None
-        
-        with open(self.arquivo, "r", encoding="utf-8") as f:
-            f.seek(posicao)
-            linha = f.readline().strip()
-            dados = linha.split(';')
-            return Matricula(dados[0],dados[1],dados[2],dados[3])
-
+        dados = self._ler_dados()
+        for d in dados:
+            if d["codigo_matricula"] == int(codigo_matricula):
+                return Matricula(d["codigo_matricula"], d["codigo_aluno"], d["codigo_modalidade"], d["qtd_aulas"])
+        return None
 
     def findAll(self):
-        posicoes = self.arvore.obter_posicoes_em_ordem()
-        matricula_cadastradas = []
-        with open(self.arquivo, "r", encoding="utf-8") as f:
-            for pos in posicoes:
-                f.seek(pos)
-                linha = f.readline().strip()
-                dados = linha.split(';')
-                mat = Matricula(dados[0],dados[1],dados[2],dados[3])
-                matricula_cadastradas.append(mat)
-            return matricula_cadastradas
+        dados = self._ler_dados()
+        return [Matricula(d["codigo_matricula"], d["codigo_aluno"], d["codigo_modalidade"], d["qtd_aulas"]) for d in dados]
 
     def delete(self, codigo_matricula):
-        posicao = self.arvore.buscar(codigo_matricula)
-
-        if posicao is None:
+        dados = self._ler_dados()
+        dados_filtrados = [d for d in dados if d["codigo_matricula"] != int(codigo_matricula)]
+        if len(dados) == len(dados_filtrados):
             return False
-        todas_matriculas = self.findAll()
-
-        with open(self.arquivo, "w", encoding="utf-8") as f:
-            pass
-            self.arvore = ArvoreBinaria()
-
-        for mat in todas_matriculas:
-            if mat.codigo_matricula != codigo_matricula:
-                self.save(mat) 
-                
+        self._salvar_dados(dados_filtrados)
         return True
 
-
     def update(self, mat_modificado: Matricula):
-            if self.arvore.buscar(mat_modificado.codigo_matricula) is None:
-                return False 
-            self.delete(mat_modificado.codigo_matricula)
-            self.save(mat_modificado)
-            
-            return True
+        dados = self._ler_dados()
+        atualizou = False
+        for i, d in enumerate(dados):
+            if d["codigo_matricula"] == int(mat_modificado.codigo_matricula):
+                dados[i] = {
+                    "codigo_matricula": int(mat_modificado.codigo_matricula),
+                    "codigo_aluno": int(mat_modificado.codigo_aluno),
+                    "codigo_modalidade": int(mat_modificado.codigo_modalidade),
+                    "qtd_aulas": int(mat_modificado.qtd_aulas)
+                }
+                atualizou = True
+                break
+        if atualizou:
+            self._salvar_dados(dados)
+        return atualizou
+
 
 class GerenciadorUsuarios:
-    def __init__(self, caminho_arquivo="data/usuarios.txt"):
+    def __init__(self, caminho_arquivo="data/usuarios.json"):
         self.arquivo = caminho_arquivo
+        
+        # Cria um admin padrão se o ficheiro não existir
+        if not os.path.exists(self.arquivo):
+            admin_padrao = [{
+                "codigo": 1,
+                "login": "admin",
+                "senha": "123",
+                "perfil": "Administrador"
+            }]
+            with open(self.arquivo, "w", encoding="utf-8") as f:
+                json.dump(admin_padrao, f, indent=4)
 
     def findByLogin(self, login_buscado):
         if not os.path.exists(self.arquivo):
             return None
 
         with open(self.arquivo, "r", encoding="utf-8") as f:
-            for linha in f:
-                dados = linha.strip().split(';')
+            try:
+                usuarios = json.load(f)
+            except json.JSONDecodeError:
+                return None
                 
-                if len(dados) == 4:
-                    codigo, login, senha, perfil = dados
-                    
-                    if login == login_buscado:
-                        return Usuario(int(codigo), login, senha, perfil)
-                        
+        for u in usuarios:
+            if u.get("login") == login_buscado:
+                return Usuario(u["codigo"], u["login"], u["senha"], u["perfil"])
+                
         return None

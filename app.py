@@ -137,7 +137,8 @@ else:
         
     st.sidebar.divider()
     opcoes_menu = ["Alunos", "Modalidades", "Matrículas"]
-    
+
+
     if st.session_state.get('perfil_usuario') == "Administrador":
         opcoes_menu.append("Faturamento")
         opcoes_menu.append("Professores")
