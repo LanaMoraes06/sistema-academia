@@ -4,10 +4,9 @@ class Usuario:
         self.login = login
         self.senha = senha
         
-        # Define quais são os perfis aceitos pelo sistema
-        perfis_permitidos = ["Administrador", "Recepcionista"]
+        perfis_permitidos = ["Administrador", "Professor", "Recepcionista"]
         
         if perfil not in perfis_permitidos:
-            raise ValueError("Erro: Perfil inválido. Escolha entre 'Administrador' ou 'Recepcionista'.")
+            raise ValueError("Erro: Perfil inválido.")
             
         self.perfil = perfil

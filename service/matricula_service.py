@@ -42,7 +42,6 @@ class MatriculaService:
 
     def excluir(self, codigo_matricula):
         matricula_excluida = self.gerenciador_mat.findById(codigo_matricula)
-        
         if not matricula_excluida:
             raise ValueError("Matrícula não encontrada.")
             

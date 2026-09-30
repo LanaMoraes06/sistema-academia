@@ -2,8 +2,9 @@ from model.aluno import Aluno
 
 class AlunoService:
 
-    def __init__(self, gerenciador_alunos):
+    def __init__(self, gerenciador_alunos, gerenciador_matriculas):
         self.gerenciador_alunos = gerenciador_alunos
+        self.gerenciador_matriculas = gerenciador_matriculas
 
     def cadastrar_aluno(self, codigo_aluno, nome, data_nascimento, peso, altura):
         if self.gerenciador_alunos.findById(codigo_aluno) is not None:
@@ -25,7 +26,11 @@ class AlunoService:
         return aluno
 
     def excluir(self, codigo_aluno):
-        self.buscar_cod(codigo_aluno)
+        aluno = self.buscar_cod(codigo_aluno)
+        todas_matriculas = self.gerenciador_matriculas.findAll()
+        for mat in todas_matriculas:
+            if int(mat.codigo_aluno) == int(codigo_aluno):
+                raise ValueError(f"Erro: O aluno {aluno.nome} possui uma matrícula ativa.")
         self.gerenciador_alunos.delete(codigo_aluno)
 
     def atualizar(self, codigo_aluno, nome, data_nascimento, peso, altura):

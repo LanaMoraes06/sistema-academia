@@ -14,7 +14,7 @@ gen_mod = GerenciadorModalidade()
 gen_mat = GerenciadorMatricula()
 gen_usuario = GerenciadorUsuarios()
 
-servico_aluno = AlunoService(gen_aluno)
+servico_aluno = AlunoService(gen_aluno, gen_mat)
 servico_prof = ProfessorService(gen_prof)
 servico_mod = ModalidadeService(gen_mod, gen_prof, gen_mat)
 servico_mat = MatriculaService(gen_mat, gen_aluno, gen_mod)
@@ -162,19 +162,19 @@ else:
                         codigo_busca = int(pesquisa)
                         professor = [p for p in professor if int(p.codigo_prof) == codigo_busca]
                     except ValueError:
-                        st.warning("⚠️ Digite apenas números para pesquisar pelo código.")
+                        st.warning("Erro: Digite apenas números para pesquisar pelo código.")
                         professor = []
                 if not professor and pesquisa:
-                    st.info(f"Nenhum professor encontrado com o código {pesquisa}.")
+                    st.info(f"Erro: Nenhum professor encontrado com o código {pesquisa}.")
                 for p in professor:
 
-                    with st.expander(f"👤 #{p.codigo_prof} — **{p.nome}**"):
+                    with st.expander(f"{p.codigo_prof} — **{p.nome}**"):
 
                         col_info, col_botoes = st.columns([3, 1])
 
                         with col_info:
-                            st.markdown(f"**📞 Telefone:** `{p.telefone}`")
-                            st.markdown(f"**📍 Endereço:** {p.endereco}")
+                            st.markdown(f"** Telefone:** `{p.telefone}`")
+                            st.markdown(f"** Endereço:** {p.endereco}")
 
                         with col_botoes:
                             btn_editar = st.button("✏️ Editar", key=f"btn_edit_{p.codigo_prof}", use_container_width=True)

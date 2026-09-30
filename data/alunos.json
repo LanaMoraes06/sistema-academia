@@ -2,8 +2,15 @@
     {
         "codigo_aluno": 1,
         "nome": "Lana",
-        "data_nascimento": "2026-09-29",
-        "peso": 73.0,
-        "altura": 1.58
+        "data_nascimento": "2021-08-30",
+        "peso": 70.0,
+        "altura": 1.9
+    },
+    {
+        "codigo_aluno": 2,
+        "nome": "Luis Felipe",
+        "data_nascimento": "2020-09-30",
+        "peso": 60.0,
+        "altura": 1.75
     }
 ]

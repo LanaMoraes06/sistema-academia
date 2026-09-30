@@ -4,5 +4,11 @@
         "login": "admin",
         "senha": "123",
         "perfil": "Administrador"
+    },
+    {
+        "codigo": 2,
+        "login": "professor",
+        "senha": "123",
+        "perfil": "Professor"
     }
 ]
