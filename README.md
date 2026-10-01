@@ -12,24 +12,7 @@ O sistema é dividido em 4 módulos principais, todos contendo operações compl
 *   **📝 Gestão de Matrículas:** Sistema inteligente que vincula alunos às modalidades, validando automaticamente a disponibilidade de vagas (lotação) e restituindo a vaga em caso de cancelamento da matrícula.
 *   **💰 Relatórios:** Cálculo em tempo real do faturamento bruto por modalidade, cruzando a quantidade de alunos matriculados com o valor da aula.
 
-## 🏗️ Arquitetura do Projeto
 
-O projeto foi desenhado utilizando o conceito de **Separação de Responsabilidades (Clean Architecture)**, isolando a interface, as regras de negócio e o armazenamento:
-
-> GERENCIAMENTO-ACADEMIA/
-> │
-> ├── app.py                  # Frontend (Interface Gráfica com Streamlit)
-> ├── model/                  # Entidades do Domínio (POO)
-> │   └── entidades.py        # Classes: Aluno, Professor, Modalidade, Matricula
-> ├── service/                # Regras de Negócio e Lógica de Aplicação
-> │   ├── aluno_service.py
-> │   ├── professor_service.py
-> │   ├── modalidade_service.py
-> │   └── matricula_service.py
-> ├── storage/                # Persistência de Dados
-> │   └── gerenciador_arquivos.py # Manipulação de arquivos .txt para cada entidade
-> └── structure/              # Estruturas de Dados Customizadas
->     └── arvore_binaria.py
 
 ## 🛠️ Tecnologias Utilizadas
 
