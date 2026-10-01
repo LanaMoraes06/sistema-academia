@@ -250,7 +250,7 @@ else:
 
         with aba_listar:
                 try:
-                    pesquisa = st.text_input("", placeholder="Digite o código do aluno")
+                    pesquisa = st.text_input("", placeholder="Digite o código do aluno:")
                     alunos = servico_aluno.listar_alunos()            
                     if pesquisa:
                         try:
