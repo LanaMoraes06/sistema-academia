@@ -45,7 +45,7 @@ def definir_fundo_login(caminho_imagem):
 
 
 st.set_page_config(
-    page_title="Sistema de Academia",
+    page_title="FemaFit",
     page_icon="💪",
     layout="wide")
 st.markdown("""
@@ -125,8 +125,7 @@ if not st.session_state['autenticado']:
                 except ValueError as erro:
                     st.error(str(erro))
                     
-                except ValueError as erro:
-                    st.error(str(erro))
+                
 else:
    
     st.sidebar.image("img/icon.png", use_container_width=True)
@@ -173,8 +172,8 @@ else:
                         col_info, col_botoes = st.columns([3, 1])
 
                         with col_info:
-                            st.markdown(f"** Telefone:** `{p.telefone}`")
-                            st.markdown(f"** Endereço:** {p.endereco}")
+                            st.markdown(f"**Telefone:** `{p.telefone}`")
+                            st.markdown(f"**Endereço:** {p.endereco}")
 
                         with col_botoes:
                             btn_editar = st.button("✏️ Editar", key=f"btn_edit_{p.codigo_prof}", use_container_width=True)
@@ -258,7 +257,7 @@ else:
                             codigo_busca = int(pesquisa)
                             alunos = [a for a in alunos if int(a.codigo_aluno) == codigo_busca]
                         except ValueError:
-                            st.warning("⚠️ Digite apenas números para pesquisar pelo código.")
+                            st.warning("Errp: Digite apenas números para pesquisar pelo código.")
                             alunos = []
 
                     if not alunos and pesquisa:
@@ -327,7 +326,7 @@ else:
                         codigo_busca = int(pesquisa)
                         modalidades = [m for m in modalidades if int(m.codigo_modalidade) == codigo_busca]
                     except ValueError:
-                        st.warning("⚠️ Digite apenas números para pesquisar pelo código.")
+                        st.warning("Erro: Digite apenas números para pesquisar pelo código.")
                         modalidades = []
 
                 if not modalidades and pesquisa:
@@ -354,7 +353,6 @@ else:
                                 servico_mod.excluir(m.codigo_modalidade)
                                 st.rerun()
 
-                        # Formulário de Edição
                         if btn_editar or st.session_state.get(f"editando_mod_{m.codigo_modalidade}", False):
                             st.session_state[f"editando_mod_{m.codigo_modalidade}"] = True 
 
@@ -371,7 +369,6 @@ else:
 
                             c_salvar, c_cancelar, _ = st.columns([2, 2, 6])
                             if c_salvar.button("✔️ Salvar", type="secondary", key=f"save_mod_{m.codigo_modalidade}", use_container_width=True):
-                                # Nota: Passamos o m.total_alunos original para não perder a contagem de quem já está matriculado!
                                 servico_mod.atualizar(m.codigo_modalidade, nova_desc, novo_prof, novo_valor, novo_limite, m.total_alunos)
                                 st.session_state[f"editando_mod_{m.codigo_modalidade}"] = False
                                 st.rerun()
@@ -411,7 +408,7 @@ else:
                                 st.error(str(erro))
 
                 except ValueError:
-                    st.warning("⚠️ Não encontramos nenhum professor com este código. Por favor, verifique.")
+                    st.warning("Erro: Não encontramos nenhum professor com este código.")
 
 
 

@@ -1,1 +1,14 @@
-[]
+[
+    {
+        "codigo_matricula": 1,
+        "codigo_aluno": 1,
+        "codigo_modalidade": 1,
+        "qtd_aulas": 1
+    },
+    {
+        "codigo_matricula": 3,
+        "codigo_aluno": 2,
+        "codigo_modalidade": 2,
+        "qtd_aulas": 6
+    }
+]

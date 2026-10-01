@@ -4,5 +4,11 @@
         "nome": "Begosso",
         "endereco": "Rua Augusto Batista 74",
         "telefone": "19888888888"
+    },
+    {
+        "codigo_prof": 2,
+        "nome": "Diomara",
+        "endereco": "CEPEIN",
+        "telefone": "19878787887"
     }
 ]

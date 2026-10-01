@@ -5,6 +5,22 @@
         "codigo_prof": 1,
         "valor_aula": 30.0,
         "limite_alunos": 3,
+        "total_alunos": 1
+    },
+    {
+        "codigo_modalidade": 2,
+        "descricao": "Musculação",
+        "codigo_prof": 2,
+        "valor_aula": 190.0,
+        "limite_alunos": 17,
+        "total_alunos": 1
+    },
+    {
+        "codigo_modalidade": 3,
+        "descricao": "Balé",
+        "codigo_prof": 1,
+        "valor_aula": 30.0,
+        "limite_alunos": 5,
         "total_alunos": 0
     }
 ]

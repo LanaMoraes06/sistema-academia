@@ -3,8 +3,8 @@
         "codigo_aluno": 1,
         "nome": "Lana",
         "data_nascimento": "2021-08-30",
-        "peso": 70.0,
-        "altura": 1.9
+        "peso": 40.0,
+        "altura": 1.98
     },
     {
         "codigo_aluno": 2,
@@ -12,5 +12,12 @@
         "data_nascimento": "2020-09-30",
         "peso": 60.0,
         "altura": 1.75
+    },
+    {
+        "codigo_aluno": 5,
+        "nome": "Célio",
+        "data_nascimento": "2017-09-30",
+        "peso": 70.0,
+        "altura": 1.7
     }
 ]

@@ -295,17 +295,6 @@ class GerenciadorMatricula:
 class GerenciadorUsuarios:
     def __init__(self, caminho_arquivo="data/usuarios.json"):
         self.arquivo = caminho_arquivo
-        
-        # Cria um admin padrão se o ficheiro não existir
-        if not os.path.exists(self.arquivo):
-            admin_padrao = [{
-                "codigo": 1,
-                "login": "admin",
-                "senha": "123",
-                "perfil": "Administrador"
-            }]
-            with open(self.arquivo, "w", encoding="utf-8") as f:
-                json.dump(admin_padrao, f, indent=4)
 
     def findByLogin(self, login_buscado):
         if not os.path.exists(self.arquivo):
